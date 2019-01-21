@@ -8,8 +8,8 @@ int pin1 = 7;
 int pin2 = 8;
 int pinPWM = 5;
 float maxVoltage = 1.68;
-float voltageValues[] = {0.8, 0.8, 0.8}; 
-int numberOfValues = 3;
+float voltageValues[] = {0.8, 0.8, 0.8, 0.8, 0.8}; 
+int numberOfValues = 5;
 bool sens = true;
 int state1 = 1;
 int state2 = 0;
@@ -63,15 +63,13 @@ void loop() {
   Serial.write(" Voltage A2: ");
   Serial.print(voltageA2); 
   Serial.write(" V");
+
+  Serial.write(", Average: ");
+  Serial.print(averageVoltageValue()); 
+  Serial.write(" V");
   
   Serial.println();
   Serial.println();
-
- 
-
-  analogWrite(pinPWM, 1);
-  digitalWrite(pin1, 1);
-  digitalWrite(pin2, 0);
 
   
   delay(1000);
@@ -87,12 +85,17 @@ void updateVoltageValues(float newVoltage){
   for(int i = 0; i< numberOfValues - 1; i++){
     voltageValues[i] = voltageValues[i+1];
   }
-  voltageValues[numberOfValues] = newVoltage;
+  voltageValues[numberOfValues - 1] = newVoltage;
   
 }
 
 float averageVoltageValue(){
-  return ((voltageValues[0] + voltageValues[1] + voltageValues[2]) / 3);
+  float average = 0;
+  for(int i = 0; i< numberOfValues; i++){
+    average += voltageValues[i];
+  }
+  average = average / numberOfValues;
+  return average;
 }
 
 void actionMotor(int currentSens){
@@ -106,10 +109,10 @@ void actionMotor(int currentSens){
   }
 
   
-  analogWrite(pinPWM, 255);
+  analogWrite(pinPWM, 100);
   digitalWrite(pin1, state1);
   digitalWrite(pin2, state2);
-  delay(1000);
+  delay(100);
 }
 
 void stopMotor(){
